@@ -53,6 +53,14 @@
   				padding: 7px 10px 4px;
 			}
 
+			.chart-title-search {
+  				border-bottom: 1px solid #d7d7d7;
+  				color: #666;
+  				font-size: 12px;
+  				font-weight: 200;
+  				padding: 7px 10px 4px;
+			}
+
 			strong 
 			{
 				font-weight: 700;
@@ -133,7 +141,7 @@
 				stroke: #888;
 			}
 			#scrolldiv {
-				height: 431px;
+				height: 400px;
 				position: absolute;
 				overflow-x:scroll;
 				overflow-y:scroll;
@@ -219,7 +227,10 @@
 				<div class="chart-title"> 
 					<strong>Diagnosis List</strong>
 				</div>
-				<div id="scrolldiv">
+				<div class="chart-title-search"> 
+					<input type="text" class="query" placeholder="Search using ICD9/Desc..." size="30" maxlength="30">
+				</div>
+				<div id="scrolldiv" class="scroller">
 					<table id="diagnosislist">
 					</table>
 				</div>
@@ -248,8 +259,88 @@
 	</body>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.min.js" charset="utf-8"></script>
+	<script language="JavaScript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
 	<script>
+
+		$(function() {
+			var search = $('.query'),
+			content = $('.scroller'),
+			matches = $(), index = 0;
+
+			search.on('input', function(e) {
+				if(search.val().length >=2) {
+
+					content.highlight(search.val(), function(found) {
+						found.parent().parent().css('background','cornflowerblue');
+					});
+				}
+				else{
+					content.highlightRestore();
+				}
+			});
+		});
+
+		(function($) {
+
+			var termPattern;
+
+			$.fn.highlight = function(term, callback) {
+
+				return this.each(function() {
+
+					var elem = $(this);
+
+					if (!elem.data('highlight-original')) {
+				
+						// Save the original element content
+						elem.data('highlight-original', elem.html());
+				
+					} else {
+				
+						// restore the original content
+						elem.highlightRestore();
+				
+					}
+
+					termPattern = new RegExp('(' + term + ')', 'ig');
+
+					// Search the element's contents
+					walk(elem);
+
+					// Trigger the callback
+					callback && callback(elem.find('.match'));
+
+				});
+			};
+
+			$.fn.highlightRestore = function() {
+		
+				return this.each(function() {
+					var elem = $(this);
+					elem.html(elem.data('highlight-original'));
+				});
+		
+			};
+
+			function walk(elem) {
+
+				elem.contents().each(function() {
+
+					if (this.nodeType == 3) { // text node
+
+						if (termPattern.test(this.nodeValue)) {
+							$(this).replaceWith(this.nodeValue.replace(termPattern, '<span class="match">$1</span>'));
+						}
+					} 
+					else {
+						walk($(this));
+					}
+				});
+			}
+		})(jQuery);
+
 		// CONSTANTS
+
 		var topChartWidth = 300;
 		var topChartHeight = 150;
 
