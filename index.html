@@ -685,7 +685,7 @@
 				selectedDataset.forEach(function(selectedDict) {
 					if (selectedDict.key === dict.icd9) {
 						selectedDict.short = dict.short;
-						selectedDict.long = dict.long;
+						selectedDict.full = dict.full;
 					}
 				});
 			});
@@ -755,7 +755,7 @@
 						visibility: "visible",
 						opacity: 1
 					});
-					d3.select("#tooltip").text(d.long+" ("+ d.value+")");
+					d3.select("#tooltip").text(d.full+" ("+ d.value+")");
 					})
 				.on("mouseleave", function(d,i) {
 					d3.select(this).style({
@@ -820,7 +820,7 @@
 						visibility: "visible",
 						opacity: 1
 					});
-					d3.select("#tooltip").text(d.long+" ("+ d.value+")");
+					d3.select("#tooltip").text(d.full+" ("+ d.value+")");
 					})
 				.on("mouseleave", function(d,i) {
 					d3.select(this).style({
@@ -1079,7 +1079,7 @@
 		{
 			location.reload();
 			d3.selectAll("svg > *").remove();
-			d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-12-MIMIC-III-Cohort-Exploration/master/icd9_2.json", function(error, data) {
+			d3.json("https://raw.githubusercontent.com/harshanandrews/MIMIC-III/master/icd9_3.json", function(error, data) {
 				icd9 = data;
 			});
 
@@ -1819,7 +1819,7 @@
 		}
 
 		// READ IN EXTERNAL FILES
-		d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-12-MIMIC-III-Cohort-Exploration/master/icd9_2.json", function(error, data) {
+		d3.json("https://raw.githubusercontent.com/harshanandrews/MIMIC-III/master/icd9_3.json", function(error, data) {
 			icd9 = data;
 		});
 
