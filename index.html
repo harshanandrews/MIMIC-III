@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<title>MIMIC-III Cohort Exploration</title>
-		<link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900' rel='stylesheet' type='text/css'>
+		<link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,900' rel='stylesheet' type='text/css'>
 		<style>
 			body {
 				background-color: lightblue;
@@ -228,7 +228,9 @@
 					<strong>Diagnosis List</strong>
 				</div>
 				<div class="chart-title-search"> 
-					<input type="text" class="query" placeholder="Search using ICD9/Desc..." size="30" maxlength="30">
+					<input id = "query" type="text" class="query" placeholder="Search using ICD9/Desc..." size="25" maxlength="30">
+					<input type="button" value="Search" onClick="highlightSearch()">
+					<input type="button" value="Reset" onClick="resetTool()">
 				</div>
 				<div id="scrolldiv" class="scroller">
 					<table id="diagnosislist">
@@ -257,12 +259,12 @@
 		</div>
 		<div id="tooltip">Toolip</div>
 	</body>
-	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.min.js" charset="utf-8"></script>
 	<script language="JavaScript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
 	<script>
 
-		$(function() {
+		/*$(function() {
 			var search = $('.query'),
 			content = $('.scroller'),
 			matches = $(), index = 0;
@@ -339,6 +341,17 @@
 			}
 		})(jQuery);
 
+		function highlightSearch() {
+    		
+    		var text = document.getElementById("query").value;
+    		var query = new RegExp("(\\b" + text + "\\b)", "gim");
+    		var e = document.getElementById("scrolldiv").innerHTML;
+    		var enew = e.replace(/(<span>|<\/span>)/igm, "");
+    		document.getElementById("scrolldiv").innerHTML = enew;
+    		var newe = enew.replace(query, "<span>$1</span>");
+    		document.getElementById("scrolldiv").innerHTML = newe;
+		}*/
+
 		// CONSTANTS
 
 		var topChartWidth = 300;
@@ -368,6 +381,14 @@
 		var diagnosisList = d3.select("#diagnosislist");
 		var oasisChart = d3.select("#oasischart");
 		var tdeathChart = d3.select("#tdeathchart");
+
+		var admissChartWrapper = admissChart.append('g');
+		var ageChartWrapper = ageChart.append('g');
+		var sexChartWrapper = sexChart.append('g');
+		var mortChartWrapper = mortChart.append('g');
+		var diagnosisListWrapper = diagnosisList.append('g');
+		var oasisChartWrapper = oasisChart.append('g');
+		var tdeathChartWrapper = tdeathChart.append('g');
 		
 		var admissDim;
 		var ageDim;
@@ -672,7 +693,39 @@
 			return selectedDataset;
 		}
 
-		function buildDiagnosisList(selectedDataset) {
+		function highlightSearch() {
+
+			d3.json("icd9_3.json", function(error, data) {
+				icd9 = data;
+			});
+			var text = document.getElementById("query").value;
+    		var query = new RegExp("(\\b" + text + "\\b)", "gim");
+    		var searchField = "full";
+    		var newDataset = [];
+
+    		for( var i = 0; i < icd9.length; i++){
+    			var el = icd9[i];
+    			var str = JSON.stringify(el.full);
+    			//console.log(text);
+    			//console.log(str);
+
+
+    			if(JSON.stringify(el).includes(text)){
+    				newDataset.push(el);
+    			}
+    		}
+
+    		console.log(newDataset);
+
+    		buildModDiagnosisList(newDataset);
+    		//buildDiagnosisList(newDataset);
+		}
+
+		function buildModDiagnosisList(selectedDataset){
+
+			diagnosisList.selectAll("tr")
+				.remove();
+
 			var headTr = diagnosisList
 				.append("tr")
 				.attr("class", "header")
@@ -685,8 +738,68 @@
 				.attr("class", "shortdesc")
 				.text("Description")
 
+
 			var tr = diagnosisList.selectAll("tr.diagnosis")
-				.data(selectedDataset, function(d,i) { return d.key; })
+				.data(selectedDataset, function(d,i) {return d.icd9; })
+				.enter()
+				.append("tr")
+				.attr("id", function(d) { return "diagnosis"+d.icd9; })
+				.on("mouseenter", function(d,i) {
+					d3.select(this).style({
+						background: "cornflowerblue",
+						color: "white"
+					})
+					d3.select("#tooltip").style({
+						top: d3.event.clientY+5,
+						left: d3.event.clientX+5,
+						visibility: "visible",
+						opacity: 1
+					});
+					d3.select("#tooltip").text(d.long+" ("+ d.value+")");
+					})
+				.on("mouseleave", function(d,i) {
+					d3.select(this).style({
+						background: undefined,
+						color: undefined
+					})
+					d3.select("#tooltip").style({
+						visibility: "hidden",
+						opacity: 0
+					});
+				});
+
+			tr
+				.append("td")
+				.attr("class", "icd9")
+				.text(function(d) { return d.icd9; })
+			tr
+				.append("td")
+				.attr("class", "shortdesc")
+				.text(function(d) { return d.short; })
+
+		}
+
+		function buildDiagnosisList(selectedDataset) {
+
+			diagnosisList.selectAll("tr")
+				.remove();
+			
+			var headTr = diagnosisList
+				.append("tr")
+				.attr("class", "header")
+			headTr
+				.append("th")
+				.attr("class", "icd9")
+				.text("ICD-9")
+			headTr
+				.append("th")
+				.attr("class", "shortdesc")
+				.text("Description")
+
+			//console.log(selectedDataset);
+
+			var tr = diagnosisList.selectAll("tr.diagnosis")
+				.data(selectedDataset, function(d,i) {return d.key; })
 				.enter()
 				.append("tr")
 				.attr("id", function(d) { return "diagnosis"+d.key; })
@@ -961,6 +1074,23 @@
 		}
 
 		// RENDER EVERYTHING
+
+		function resetTool()
+		{
+			location.reload();
+			d3.selectAll("svg > *").remove();
+			d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-12-MIMIC-III-Cohort-Exploration/master/icd9_2.json", function(error, data) {
+				icd9 = data;
+			});
+
+			d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-12-MIMIC-III-Cohort-Exploration/master/MIMIC_InfoVis_4.json", function(error, data) {
+				patients = data;
+				init();
+				render();
+				renderLabels();
+			});
+		}
+
 		function render() {
 			renderTopChart(admissChart, admissDim, admissKeyFunction, admissOrderFunction, admissPatientNumbers, admissSelectedPatientNumbers, admissScales, "admiss", admissSelected, admissFilterStrings, admissFilterStringFunction);
 			renderTopChart(mortChart, mortDim, mortKeyFunction, mortOrderFunction, mortPatientNumbers, mortSelectedPatientNumbers, mortScales, "mort", mortSelected, mortFilterStrings, mortFilterStringFunction);
@@ -1535,14 +1665,6 @@
 
 		function renderLabels () {
 
-			var admissChartWrapper = admissChart.append('g');
-			var ageChartWrapper = ageChart.append('g');
-			var sexChartWrapper = sexChart.append('g');
-			var mortChartWrapper = mortChart.append('g');
-			var diagnosisListWrapper = diagnosisList.append('g');
-			var oasisChartWrapper = oasisChart.append('g');
-			var tdeathChartWrapper = tdeathChart.append('g');
-
 			//X-Axis labels
 			
 			admissChartWrapper.append("text")
@@ -1589,6 +1711,15 @@
 				.style("font-size", "9px")
 				.style("font-weight", "bold")
 				.text("OASIS Category");
+
+			tdeathChartWrapper.append("text")
+				.attr("x", chartMargin.left + 200)
+				.attr("y", chartMargin.top + 112)
+				.style("text-anchor", "middle")
+				.style("font-family", "Garabond")
+				.style("font-size", "9px")
+				.style("font-weight", "bold")
+				.text("Days till death");
 
 			//Y-Axis Labels
 
@@ -1646,6 +1777,17 @@
 				.style("font-size", "10px")
 				.style("font-weight", "bold")
 				.text("Records");
+
+			tdeathChartWrapper.append("text")
+				.attr("transform", "rotate(-90)")
+				.attr("x", -50)
+				.attr("y", 10)
+				.attr("dy", "1em")
+				.style("text-anchor", "middle")
+				.style("font-family", "Garabond")
+				.style("font-size", "10px")
+				.style("font-weight", "bold")
+				.text("Death of patients (%)");
 
 		}
 
