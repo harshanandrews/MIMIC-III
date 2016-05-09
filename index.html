@@ -351,13 +351,12 @@
 		};
 		var mortKeyFunction = function(d) {
 			// this is the problem! chooses only one
-			//var mortDesc = null;
-			//if (d.mort == 0) { mortDesc = 'Survived'; }
-			//else if (d.mort == 5 || d.mort == 4 ) { mortDesc = 'ICU Mort'; }
-			//else if (d.mort == 5 || d.mort == 4 || d.mort == 3 || d.mort == 2) { mortDesc = 'Hospital Mort'; }
-			//else if (d.mort == 1 || d.mort == 3 || d.mort == 5) { mortDesc = '30day Mort'; }
-			//return mortDesc;
-			return d.mort;
+			var mortDesc = null;
+			if (d.mort == '0') { mortDesc = 'Survived'; }
+			else if (d.mort == '5' || d.mort == '4' ) { mortDesc = 'ICU_Mort'; }
+			else if (d.mort == '2' || d.mort == '3' || d.mort == '4') { mortDesc = 'Hospital_Mort'; }
+			else if (d.mort == '1' || d.mort == '3' || d.mort == '5') { mortDesc = '30day_Mort'; }
+			return mortDesc;
 		};
 		//diagnosisKeyFunction too complicated
 		var oasisKeyFunction = function(d) {
@@ -458,11 +457,11 @@
 			//return "(d=='"+key+"')";
 		};
 		function mortFilterStringFunction(key) {
-			/*if (key === 'Survived') { return "d==0"; }
-			else if (key === 'ICU_Mort') { return "d==5||d==4"; }
-			else if (key === 'Hospital_Mort') { return "d==5||d==4||d==3||d==2"; }
-			else if (key === '30day_Mort') { return "d==1||d==3||d==5"; }*/
-			return "(d=="+key+")";
+			if (key === 'Survived') { return "d==0"; }
+			else if (key === 'ICU_Mort') { return "d==5 "; }
+			else if (key === 'Hospital_Mort') { return "d==2 || d==3 || d==4"; }
+			else if (key === '30day_Mort') { return "d==1 || d==3 || d==5"; }
+			//return "(d=="+key+")";
 		};
 		function diagnosisFilterStringFunction(key) {
 			//return JSON.stringify({"d1":""});
