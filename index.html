@@ -3,6 +3,7 @@
 		<title>MIMIC-III Cohort Exploration</title>
 		<style>
 			body {
+				background-color: lightblue;
 				font-family: sans-serif;
 			}
 
@@ -66,6 +67,7 @@
 			}
 
 			.vis {
+				background-color: white;
 				width: 1224px;
 				height: 618px;
 			}
@@ -77,11 +79,11 @@
 			}
 			.topchart {
 				width: 300px;
-				height: 150px;
+				height: 120px;
 			}
 			#diagnosislistchartarea {
 				width: 300px;
-				height: 482px;
+				height: 456px;
 				overflow-x:scroll;
 				overflow-y:scroll;
 			}
@@ -91,7 +93,7 @@
 			}
 			.bottomchart {
 				width: 453px;
-				height: 150px;
+				height: 125px;
 			}
 			.topchart rect {
 				cursor: pointer;
@@ -140,7 +142,7 @@
 				stroke: #888;
 			}
 			#scrolldiv {
-				height: 420px;
+				height: 400px;
 				position: absolute;
 				overflow-x:scroll;
 				overflow-y:scroll;
@@ -183,6 +185,13 @@
 		</style>
 	</head>
 	<body>
+		<div id="header">
+			<div class="container">
+				<div id="logo">
+					<h1>MIMIC III - Cohort Exploration</h1>
+				</div>
+			</div>
+		</div>
 		<div class="vis">
 			<div class="chartarea">
 				<div class="chart-title"> 
@@ -262,7 +271,7 @@
 		var bottomChartWidth = 453;
 		var bottomChartHeight = 150;
 
-		var chartMargin = {top:20,right:20,bottom:40,left:40};
+		var chartMargin = {top:5,right:20,bottom:50,left:40};
 
 		// CALCULATED CONSTANTS
 		var topChartInnerWidth = topChartWidth-chartMargin.left-chartMargin.right;
