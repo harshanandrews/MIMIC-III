@@ -601,12 +601,12 @@
 
     		for( var i = 0; i < icd9.length; i++){
     			var el = icd9[i];
-    			var str = JSON.stringify(el.full);
+    			//var str = JSON.stringify(el.full).toLowerCase();
     			//console.log(text);
     			//console.log(str);
 
 
-    			if(JSON.stringify(el).includes(text)){
+    			if(JSON.stringify(el).toLowerCase().includes(text)){
     				newDataset.push(el);
     			}
     		}
@@ -673,6 +673,33 @@
 				.attr("class", "shortdesc")
 				.text(function(d) { return d.short; })
 
+		}
+
+		function updateModData(selectedDataset) {
+			updateTopChart(admissChart, admissDim, admissKeyFunction, admissOrderFunction, admissSelectedPatientNumbers, admissScales, admissSelected);
+			updateTopChart(ageChart, ageDim, ageKeyFunction, ageOrderFunction, ageSelectedPatientNumbers, ageScales, ageSelected);
+			updateTopChart(sexChart, sexDim, sexKeyFunction, sexOrderFunction, sexSelectedPatientNumbers, sexScales, sexSelected);
+			//updateTopChart(mortChart, mortDim, mortKeyFunction, mortOrderFunction, mortSelectedPatientNumbers, mortScales, mortSelected);
+			updateMortChart();
+
+			updateModDiagnosisList(selectedDataset);
+
+			updateOasisChart();
+			updateTdeathChart();
+/*<<<<<<< HEAD
+		}
+
+		// RENDER CHART FUNCTIONS
+=======*/
+			updateFlowChart();
+		}
+
+		function updateModDiagnosisList(selectedDataset)
+		{
+			diagnosisList.selectAll("tr")
+				.remove();
+
+			buildModDiagnosisList(selectedDataset);
 		}
 
 		function buildDiagnosisList(selectedDataset) {
@@ -995,7 +1022,7 @@
 			selectedDataset
 				.sort(function(a,b) { return d3.ascending(a.key, b.key); });
 
-			console.log(selectedDataset);
+			//console.log(selectedDataset);
 
 			if (selectedDataset[selectedDataset.length-1].key === "null") { selectedDataset = selectedDataset.slice(0,selectedDataset.length-1); }
 
